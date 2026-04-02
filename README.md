@@ -63,3 +63,15 @@ BookVerseAI/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
+
+## How to Run
+
+
+Install required libraries
+pip install -r requirements.txt
+Train the recommendation model (only once)
+python train_model.py
+Run the Flask app
+python app.py
+Open in browser
+http://127.0.0.1:5000
