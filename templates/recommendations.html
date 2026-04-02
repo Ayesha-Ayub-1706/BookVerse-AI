@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations - BookVerse AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="animation: fadeInRight 0.8s ease-out;">
+    <nav class="navbar">
+        <div class="nav-brand"><a href="{{ url_for('home') }}">BookVerse AI</a></div>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="{{ url_for('home') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="section-header" style="margin-top: 8rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <h2>Showing results for "{{ original_search }}"</h2>
+        {% if closest_match and original_search.lower() != closest_match.lower() %}
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 10px;">
+            No exact match found. Showing closest results instead.
+        </p>
+        {% endif %}
+        {% if closest_match %}
+        <h3 style="margin-top: 20px; color: var(--accent-light);">Matched Book: {{ closest_match }}</h3>
+        {% endif %}
+    </div>
+
+    <div class="premium-grid">
+        {% for book in recommendations %}
+        <a href="{{ url_for('book_detail', book_title=book.title) }}" style="text-decoration: none; color: inherit;">
+        <div class="book-card-premium">
+            <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
+            <div class="bc-overlay">
+                <div class="bc-title" title="{{ book.title }}">{{ book.title }}</div>
+                <div class="bc-author">{{ book.author }}</div>
+                <div class="bc-meta">
+                    <span class="bc-genre">{{ book.genre }}</span>
+                    <span class="bc-rating">⭐ {{ book.rating }}</span>
+                </div>
+            </div>
+        </div>
+        </a>
+        {% else %}
+        <div style="text-align: center; width: 100%; color: var(--text-muted); grid-column: 1 / -1;">
+            <h3>No recommendations found for this book. Try searching another one.</h3>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

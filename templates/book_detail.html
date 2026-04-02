@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - BookVerse AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="animation: fadeInRight 0.8s ease-out;">
+
+    <nav class="navbar">
+        <div class="nav-brand"><a href="{{ url_for('home') }}">BookVerse AI</a></div>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="{{ url_for('home') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="bd-container">
+        <div class="bd-card">
+            <div class="bd-bg-glow"></div>
+            <div class="bd-left">
+                <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
+            </div>
+            <div class="bd-right">
+                <span class="bd-genre">{{ book.genre }}</span>
+                <h1 class="bd-title">{{ book.title }}</h1>
+                <h3 class="bd-author">By {{ book.author }}</h3>
+                <div class="bd-rating">⭐ {{ book.rating }} Rating</div>
+                <p class="bd-desc">{{ book.description }}</p>
+                <div>
+                    <a href="{{ book.purchase_link }}" target="_blank" class="btn-primary bd-buy">
+                        Buy on Amazon
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if recommendations %}
+        <div class="section-header" style="padding:0; margin-top:5rem;">
+            <h2>You May Also Like</h2>
+        </div>
+        <div class="horizontal-scroll" style="padding: 0 0 3rem;" id="row-more">
+            {% for rec in recommendations %}
+            <a href="{{ url_for('book_detail', book_title=rec.title) }}" style="text-decoration: none; color: inherit;">
+                <div class="book-card-premium">
+                    <img src="{{ rec.image }}" alt="{{ rec.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
+                    <div class="bc-overlay">
+                        <div class="bc-title" title="{{ rec.title }}">{{ rec.title }}</div>
+                        <div class="bc-author">{{ rec.author }}</div>
+                        <div class="bc-meta">
+                            <span class="bc-genre">{{ rec.genre }}</span>
+                            <span class="bc-rating">⭐ {{ rec.rating }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
