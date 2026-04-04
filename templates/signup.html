@@ -1,55 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - BookVerse AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="particles">
-        <div class="circle c1"></div>
-        <div class="circle c3"></div>
+{% extends "base.html" %}
+{% block title %}Sign Up - BookVerse AI{% endblock %}
+{% block content %}
+<div class="auth-container fade-in">
+    <div class="auth-card signup-card">
+        <h2>Join BookVerse <span class="accent">AI</span></h2>
+        <p class="auth-subtitle">Create an account to start your journey</p>
+        
+        <form method="POST" action="{{ url_for('signup') }}">
+            <div class="form-group">
+                <label for="username">Display Name</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" name="username" required placeholder="BookWorm99">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="email" name="email" required placeholder="you@example.com">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-icon">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" name="password" required placeholder="••••••••">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Create Account</button>
+        </form>
+        
+        <p class="auth-footer">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
     </div>
-
-    <nav class="navbar">
-        <div class="nav-brand"><a href="{{ url_for('home') }}">BookVerse AI</a></div>
-    </nav>
-
-    <div class="flashes">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
-
-    <div class="auth-container">
-        <div class="auth-card">
-            <h2>Sign Up</h2>
-            <form action="{{ url_for('signup') }}" method="POST">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn-primary auth-btn">Sign Up</button>
-                <div class="auth-links">
-                    Already have an account? <a href="{{ url_for('login') }}">Login</a>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+</div>
+{% endblock %}

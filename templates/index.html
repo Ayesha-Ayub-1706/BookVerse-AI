@@ -1,176 +1,255 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookVerse AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <nav class="navbar">
-        <div class="nav-brand">BookVerse AI</div>
-        <div class="hamburger" id="hamburger">
-            <span></span><span></span><span></span>
-        </div>
-        <div class="nav-links" id="nav-links">
-            {% if session.get('user_id') %}
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('logout') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Logout</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('signup') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Signup</a>
-            {% endif %}
-        </div>
-    </nav>
+{% block title %}BookVerse AI - Futuristic Dashboard{% endblock %}
 
-    <!-- Flash Messages -->
-    <div class="flashes">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% block navbar %}{% endblock %}
+
+{% block head %}
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+<style>
+/* Dashboard-specific injected styles to override defaults */
+body {
+    background-color: #0a0a0f !important;
+    color: #e2e8f0;
+}
+.flash-messages { top: 20px; }
+.main-content {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Ambient Particles Background -->
+<div id="particles-js" class="particles-bg"></div>
+
+<!-- Futuristic Floating Quick Actions -->
+<div class="quick-actions-menu">
+    <div class="qa-toggle" id="qaToggle">
+        <i class="fa-solid fa-compass"></i>
     </div>
+    <div class="qa-items">
+        <a href="{{ url_for('favorites_page') }}" class="qa-item" title="Favorites"><i class="fa-solid fa-heart"></i></a>
+        <a href="{{ url_for('reading_list_page') }}" class="qa-item" title="Reading List"><i class="fa-solid fa-bookmark"></i></a>
+        <a href="{{ url_for('profile') }}" class="qa-item" title="Profile"><i class="fa-solid fa-user"></i></a>
+        <a href="{{ url_for('logout') }}" class="qa-item" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+</div>
 
-    <!-- Hero Ecommerce Section -->
-    <header class="hero-ecommerce">
-        <div class="hero-left">
-            <div class="hero-badge">#1 Personalized Book Recommender</div>
-            <h1>Discover Your Next Favorite Book</h1>
-            <p>Explore books based on your favorite genres, reading history and interests.</p>
+<div class="dashboard-container">
+    
+    <!-- Section 1: Hero Dashboard -->
+    <section class="hero-dashboard">
+        <div class="hero-left" data-aos="fade-right">
+            <h1 class="greeting">Welcome back, <span class="gradient-text">{{ session.get('username') }}</span></h1>
+            <p class="subtitle">Your next favorite story is waiting for you.</p>
             
-            <form action="{{ url_for('recommendation') }}" method="POST" class="hero-search">
-                <input type="text" name="book_name" placeholder="Search books, authors or genres..." required>
-                <button type="submit">Search</button>
-            </form>
-
-            <div class="hero-buttons">
-                <a href="#trending" class="btn-primary">Get Started</a>
-                <a href="#genres" class="btn-secondary">Explore Genres</a>
+            <div class="search-wrapper">
+                <form action="{{ url_for('search_post') }}" method="POST" class="glow-search-form">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" name="book_name" placeholder="Immerse yourself into a new world..." required class="glow-input">
+                    <button type="submit" class="glow-btn">Discover</button>
+                    <div class="search-glow-blur"></div>
+                </form>
             </div>
+
+            {% if recent_searches %}
+            <div class="recent-chips fade-in-up delay-1">
+                <span class="chip-label">Recent:</span>
+                {% for search in recent_searches %}
+                <form action="{{ url_for('search_post') }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="book_name" value="{{ search.query }}">
+                    <button type="submit" class="glass-chip">{{ search.query }}</button>
+                </form>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         
-        <div class="hero-right">
+        <div class="hero-right" data-aos="fade-left">
             <div class="book-stack">
-                {% if popular_books|length >= 3 %}
-                <img src="{{ popular_books[2].image }}" class="stack-card stack-1" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                <img src="{{ popular_books[1].image }}" class="stack-card stack-2" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                <img src="{{ popular_books[0].image }}" class="stack-card stack-3" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                
-                <div class="floating-card fc-1">
-                    <img src="{{ popular_books[0].image }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                    <div>
-                        <div style="font-weight: bold; color: white;">⭐ {{ popular_books[0].rating }}</div>
-                        <div style="font-size: 0.8rem; color: #ccc;">{{ popular_books[0].genre }}</div>
+                {% if recommended_for_you|length >= 3 %}
+                    {% for i in range(3) %}
+                    <div class="stack-card card-{{ i+1 }}" data-tilt data-tilt-glare data-tilt-max-glare="0.5">
+                        <img src="{{ recommended_for_you[i].image }}" alt="Cover">
                     </div>
-                </div>
-                
-                <div class="floating-card fc-2">
-                    <img src="{{ popular_books[1].image }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                    <div>
-                        <div style="font-weight: bold; color: white;">⭐ {{ popular_books[1].rating }}</div>
-                        <div style="font-size: 0.8rem; color: #ccc;">{{ popular_books[1].genre }}</div>
-                    </div>
-                </div>
+                    {% endfor %}
                 {% endif %}
             </div>
         </div>
-    </header>
-
-    <!-- Popular Genres Section -->
-    <section id="genres">
-        <div class="section-header">
-            <h2>Popular Genres</h2>
-            <div class="row-controls">
-                <button class="nav-arrow prev-btn" data-target="row-genres">&lt;</button>
-                <button class="nav-arrow next-btn" data-target="row-genres">&gt;</button>
-            </div>
-        </div>
-        <div class="horizontal-scroll" id="row-genres">
-            {% set genre_data = [
-                {'name': 'Romance', 'desc': 'Heartwarming love stories.'},
-                {'name': 'Fantasy', 'desc': 'Magic, mythical creatures and quests.'},
-                {'name': 'Thriller', 'desc': 'Edge of your seat suspense.'},
-                {'name': 'Mystery', 'desc': 'Unravel the unknown.'},
-                {'name': 'Young Adult', 'desc': 'Coming of age adventures.'},
-                {'name': 'Science Fiction', 'desc': 'Future tech and space exploration.'}
-            ] %}
-            
-            {% for g in genre_data %}
-            <a href="{{ url_for('genre_page', genre=g.name) }}" style="text-decoration:none;">
-            <div class="genre-card">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600" alt="Genre Background">
-                <div class="genre-overlay">
-                    <h3>{{ g.name }}</h3>
-                    <p>{{ g.desc }}</p>
-                </div>
-            </div>
-            </a>
-            {% endfor %}
-        </div>
     </section>
 
-    <!-- Trending Now (Popular Books) -->
-    <section id="trending">
-        <div class="section-header">
-            <h2>Trending Now</h2>
-            <div class="row-controls">
-                <button class="nav-arrow prev-btn" data-target="row-trending">&lt;</button>
-                <button class="nav-arrow next-btn" data-target="row-trending">&gt;</button>
+    <!-- Section 4: Glassmorphic Stats -->
+    <section class="stats-dashboard fade-in-up delay-2">
+        <a href="{{ url_for('profile') }}" class="glass-stat-card floating-anim-1">
+            <div class="stat-icon"><i class="fa-solid fa-book-open"></i></div>
+            <div class="stat-text">
+                <h4>Total Explored</h4>
+                <h2>{{ total_explored }}</h2>
             </div>
-        </div>
-        <div class="horizontal-scroll" id="row-trending">
-            {% for book in popular_books %}
-            <a href="{{ url_for('book_detail', book_title=book.title) }}" style="text-decoration: none; color: inherit;">
-            <div class="book-card-premium">
-                <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                <div class="bc-overlay">
-                    <div class="bc-title" title="{{ book.title }}">{{ book.title }}</div>
-                    <div class="bc-author">{{ book.author }}</div>
-                    <div class="bc-meta">
-                        <span class="bc-genre">{{ book.genre }}</span>
-                        <span class="bc-rating">⭐ {{ book.rating }}</span>
-                    </div>
-                </div>
+        </a>
+        <a href="{% if user_top_genre %}{{ url_for('genre_page', genre=user_top_genre) }}{% else %}#{% endif %}" class="glass-stat-card floating-anim-2">
+            <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+            <div class="stat-text">
+                <h4>Top Genre</h4>
+                <h2>{{ user_top_genre or 'Fantasy' }}</h2>
             </div>
-            </a>
-            {% endfor %}
-        </div>
+        </a>
+        <a href="{{ url_for('favorites_page') }}" class="glass-stat-card floating-anim-3">
+            <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
+            <div class="stat-text">
+                <h4>Saved Books</h4>
+                <h2 style="font-size: 1.5rem;">{{ saved_books_stats.favorites }} Favs &bull; {{ saved_books_stats.reading_list }} List</h2>
+            </div>
+        </a>
     </section>
 
-    <!-- Recommended For You -->
-    {% if recommended_for_you %}
-    <section>
-        <div class="section-header">
-            <h2>Recommended For You</h2>
-            <div class="row-controls">
-                <button class="nav-arrow prev-btn" data-target="row-rec">&lt;</button>
-                <button class="nav-arrow next-btn" data-target="row-rec">&gt;</button>
+    <!-- Section 5: Continue Reading -->
+    {% if popular_books and popular_books|length > 0 %}
+    <section class="continue-reading fade-in-up" data-aos="fade-up">
+        <h2 class="section-title">Jump Back In</h2>
+        <div class="open-book-card">
+            <div class="ob-left">
+                <img src="{{ popular_books[0].image }}" alt="Cover">
             </div>
-        </div>
-        <div class="horizontal-scroll" id="row-rec">
-            {% for book in recommended_for_you %}
-            <a href="{{ url_for('book_detail', book_title=book.title) }}" style="text-decoration: none; color: inherit;">
-            <div class="book-card-premium">
-                <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                <div class="bc-overlay">
-                    <div class="bc-title" title="{{ book.title }}">{{ book.title }}</div>
-                    <div class="bc-author">{{ book.author }}</div>
-                    <div class="bc-meta">
-                        <span class="bc-genre">{{ book.genre }}</span>
-                        <span class="bc-rating">⭐ {{ book.rating }}</span>
-                    </div>
+            <div class="ob-right">
+                <h3>{{ popular_books[0].title }}</h3>
+                <p class="author">{{ popular_books[0].author }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 65%;"></div>
                 </div>
+                <p class="progress-text">65% Completed</p>
+                <a href="{{ url_for('book_detail', book_title=popular_books[0].title) }}" class="btn-glow">Continue Reading <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            </a>
-            {% endfor %}
         </div>
     </section>
     {% endif %}
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+    <!-- Section 2: Personalized Recommendation Carousels -->
+    <section class="carousels-container">
+        
+        {% if recommended_for_you %}
+        <div class="carousel-section fade-in-up" data-aos="fade-up">
+            <h2 class="carousel-title">Because You Loved <span class="gradient-text">{{ user_top_genre or 'Young Adult' }}</span></h2>
+            <div class="swiper book-swiper">
+                <div class="swiper-wrapper">
+                    {% for book in recommended_for_you %}
+                    <div class="swiper-slide">
+                        <a href="{{ url_for('book_detail', book_title=book.title) }}" class="mega-card-link">
+                            <div class="mega-card" data-tilt data-tilt-scale="1.05">
+                                <div class="badge-why"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Match</div>
+                                <img src="{{ book.image }}" alt="{{ book.title }}">
+                                <div class="mega-card-info">
+                                    <h4>{{ book.title }}</h4>
+                                    <p>{{ book.author }}</p>
+                                    <div class="m-meta">
+                                        <span>{{ book.genre }}</span>
+                                        <span><i class="fa-solid fa-star" style="color:#f59e0b;"></i> {{ book.rating }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Add Pagination & Nav -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="carousel-section fade-in-up" data-aos="fade-up">
+            <h2 class="carousel-title">Trending Globally</h2>
+            <div class="swiper book-swiper">
+                <div class="swiper-wrapper">
+                    {% for book in popular_books %}
+                    <div class="swiper-slide">
+                        <a href="{{ url_for('book_detail', book_title=book.title) }}" class="mega-card-link">
+                            <div class="mega-card" data-tilt data-tilt-scale="1.05">
+                                <div class="badge-why trending"><i class="fa-solid fa-fire"></i> Hot</div>
+                                <img src="{{ book.image }}" alt="{{ book.title }}">
+                                <div class="mega-card-info">
+                                    <h4>{{ book.title }}</h4>
+                                    <p>{{ book.author }}</p>
+                                    <div class="m-meta">
+                                        <span>{{ book.genre }}</span>
+                                        <span><i class="fa-solid fa-star" style="color:#f59e0b;"></i> {{ book.rating }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- JS Libraries -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Initialize Particles.js
+    if (document.getElementById('particles-js')) {
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 40, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": ["#8b5cf6", "#3b82f6", "#ffffff"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                "size": { "value": 3, "random": true, "anim": { "enable": true, "speed": 2, "size_min": 0.1, "sync": false } },
+                "line_linked": { "enable": true, "distance": 150, "color": "#475569", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false }, "resize": true },
+                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } } }
+            },
+            "retina_detect": true
+        });
+    }
+
+    // 2. Initialize Swiper Carousels
+    const swipers = document.querySelectorAll('.book-swiper');
+    swipers.forEach(el => {
+        new Swiper(el, {
+            slidesPerView: 1.5,
+            spaceBetween: 20,
+            freeMode: true,
+            navigation: {
+                nextEl: el.querySelector('.swiper-button-next'),
+                prevEl: el.querySelector('.swiper-button-prev'),
+            },
+            breakpoints: {
+                640: { slidesPerView: 2.5, spaceBetween: 20 },
+                1024: { slidesPerView: 4.5, spaceBetween: 30 }
+            }
+        });
+    });
+
+    // 3. Floating Quick Actions Toggle
+    const qaToggle = document.getElementById('qaToggle');
+    const qaMenu = document.querySelector('.quick-actions-menu');
+    if (qaToggle) {
+        qaToggle.addEventListener('click', () => {
+            qaMenu.classList.toggle('open');
+        });
+    }
+});
+</script>
+{% endblock %}

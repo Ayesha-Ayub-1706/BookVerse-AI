@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}My Profile - BookVerse AI{% endblock %}
+
+{% block content %}
+<div class="profile-layout fade-in">
+    <div class="profile-sidebar">
+        <div class="profile-avatar">
+            <i class="fa-solid fa-user-astronaut"></i>
+        </div>
+        <h2>{{ user.username }}</h2>
+        <p class="role-badge">{{ session.get('role', 'Reader').capitalize() }}</p>
+        
+        <div class="profile-stats">
+            <div class="stat-box">
+                <span class="stat-num">{{ stats.favorites_count }}</span>
+                <span class="stat-label">Favorites</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num">{{ stats.reading_count }}</span>
+                <span class="stat-label">Reading List</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="profile-main">
+        <section class="profile-section">
+            <h3><i class="fa-solid fa-fire"></i> Your Top Genres</h3>
+            {% if favorite_genres %}
+                <div class="tags-container">
+                    {% for g in favorite_genres %}
+                        <a href="{{ url_for('genre_page', genre=g.genre) }}" class="tag-btn genre-pulse">{{ g.genre }} ({{ g.count }})</a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state-text">You haven't explored much yet. Keep reading to build your profile!</p>
+            {% endif %}
+        </section>
+
+        <section class="profile-section mt-4">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Searches</h3>
+            {% if recent_searches %}
+                <ul class="recent-searches-list">
+                    {% for search in recent_searches %}
+                    <li>
+                        <form action="{{ url_for('search_post') }}" method="POST">
+                            <input type="hidden" name="book_name" value="{{ search.query }}">
+                            <button type="submit" class="text-btn"><i class="fa-solid fa-magnifying-glass"></i> {{ search.query }}</button>
+                        </form>
+                        <span class="search-time">{{ search.timestamp.split()[0] }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-state-text">No recent searches.</p>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

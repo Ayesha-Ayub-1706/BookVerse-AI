@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - BookVerse AI{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper fade-in">
+    <div class="admin-header">
+        <h1>Admin Control Panel</h1>
+        
+        <form action="{{ url_for('admin_retrain') }}" method="POST" onsubmit="return confirm('This will take a few seconds and recreate the recommendation pickle files. Are you sure?');">
+            <button type="submit" class="btn-primary btn-xl" id="retrainBtn">
+                <i class="fa-solid fa-brain"></i> Retrain Recommendation Model
+            </button>
+        </form>
+    </div>
+
+    <div class="admin-stats mt-4">
+        <div class="admin-stat-card">
+            <i class="fa-solid fa-users"></i>
+            <div>
+                <h3>{{ stats.users }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+        <div class="admin-stat-card">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+            <div>
+                <h3>{{ stats.searches }}</h3>
+                <p>Total Searches</p>
+            </div>
+        </div>
+        <div class="admin-stat-card">
+            <i class="fa-solid fa-book"></i>
+            <div>
+                <h3>{{ books|length }}</h3>
+                <p>Books Loaded</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-section mt-4">
+        <h2>Add New Book</h2>
+        <form action="{{ url_for('admin_add_book') }}" method="POST" class="admin-form">
+            <input type="text" name="title" placeholder="Book Title" required class="stylish-input">
+            <input type="text" name="author" placeholder="Author" required class="stylish-input">
+            <input type="text" name="genre" placeholder="Genre" required class="stylish-input">
+            <input type="number" step="0.1" name="rating" placeholder="Rating (0.0 to 5.0)" class="stylish-input">
+            <button type="submit" class="btn-secondary">Add Book to DB</button>
+        </form>
+    </div>
+
+    <div class="admin-section mt-4">
+        <h2>Manage Books Database</h2>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Genre</th>
+                        <th>Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr>
+                        <td>{{ book.id }}</td>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.genre }}</td>
+                        <td>{{ book.rating }}</td>
+                        <td>
+                            <form action="{{ url_for('admin_delete_book', book_id=book.id) }}" method="POST" onsubmit="return confirm('Delete this book?');">
+                                <button type="submit" class="btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

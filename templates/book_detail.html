@@ -1,67 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ book.title }} - BookVerse AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body style="animation: fadeInRight 0.8s ease-out;">
+{% extends "base.html" %}
+{% block title %}Book Details - {{ book.title }}{% endblock %}
 
-    <nav class="navbar">
-        <div class="nav-brand"><a href="{{ url_for('home') }}">BookVerse AI</a></div>
-        <div class="hamburger" id="hamburger">
-            <span></span><span></span><span></span>
-        </div>
-        <div class="nav-links" id="nav-links">
-            <a href="{{ url_for('home') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Back to Home</a>
-        </div>
-    </nav>
-
-    <div class="bd-container">
-        <div class="bd-card">
-            <div class="bd-bg-glow"></div>
-            <div class="bd-left">
-                <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
+{% block content %}
+<div class="book-detail-wrapper fade-in">
+    <div class="book-detail-hero">
+        <img src="{{ book.image }}" alt="{{ book.title }}" class="detail-cover">
+        <div class="detail-info">
+            <h1>{{ book.title }}</h1>
+            <h3 class="author">By {{ book.author }}</h3>
+            
+            <div class="meta-tags">
+                <span class="tag genre-tag">{{ book.genre }}</span>
+                <span class="tag rating-tag"><i class="fa-solid fa-star"></i> {{ book.rating }}/5.0</span>
             </div>
-            <div class="bd-right">
-                <span class="bd-genre">{{ book.genre }}</span>
-                <h1 class="bd-title">{{ book.title }}</h1>
-                <h3 class="bd-author">By {{ book.author }}</h3>
-                <div class="bd-rating">⭐ {{ book.rating }} Rating</div>
-                <p class="bd-desc">{{ book.description }}</p>
-                <div>
-                    <a href="{{ book.purchase_link }}" target="_blank" class="btn-primary bd-buy">
-                        Buy on Amazon
-                    </a>
-                </div>
+            
+            <p class="description">{{ book.description }}</p>
+            
+            <div class="action-buttons">
+                <!-- Favorite -->
+                <form action="{{ url_for('toggle_favorite') }}" method="POST" class="inline-form">
+                    <input type="hidden" name="book_title" value="{{ book.title }}">
+                    <button type="submit" class="btn-icon {% if is_favorite %}active-fav{% endif %}" title="Toggle Favorite">
+                        <i class="fa-{% if is_favorite %}solid{% else %}regular{% endif %} fa-heart"></i>
+                    </button>
+                </form>
+
+                <!-- Reading List dropdown -->
+                <form action="{{ url_for('update_reading_list') }}" method="POST" class="inline-form flex-form">
+                    <input type="hidden" name="book_title" value="{{ book.title }}">
+                    <select name="status" class="stylish-select" onchange="this.form.submit()">
+                        <option value="" disabled {% if not reading_status %}selected{% endif %}>Add to list...</option>
+                        <option value="Want to Read" {% if reading_status == 'Want to Read' %}selected{% endif %}>Want to Read</option>
+                        <option value="Reading" {% if reading_status == 'Reading' %}selected{% endif %}>Currently Reading</option>
+                        <option value="Completed" {% if reading_status == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </form>
+
+                <!-- Amazon -->
+                <a href="{{ book.purchase_link }}" target="_blank" class="btn-amazon"><i class="fa-brands fa-amazon"></i> Buy Now</a>
             </div>
         </div>
-
-        {% if recommendations %}
-        <div class="section-header" style="padding:0; margin-top:5rem;">
-            <h2>You May Also Like</h2>
-        </div>
-        <div class="horizontal-scroll" style="padding: 0 0 3rem;" id="row-more">
-            {% for rec in recommendations %}
-            <a href="{{ url_for('book_detail', book_title=rec.title) }}" style="text-decoration: none; color: inherit;">
-                <div class="book-card-premium">
-                    <img src="{{ rec.image }}" alt="{{ rec.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-                    <div class="bc-overlay">
-                        <div class="bc-title" title="{{ rec.title }}">{{ rec.title }}</div>
-                        <div class="bc-author">{{ rec.author }}</div>
-                        <div class="bc-meta">
-                            <span class="bc-genre">{{ rec.genre }}</span>
-                            <span class="bc-rating">⭐ {{ rec.rating }}</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+    <!-- Review Section -->
+    <div class="reviews-section fade-in-up">
+        <h2>Reader Reviews</h2>
+        
+        <div class="review-form-card">
+            <h4>Leave a Review</h4>
+            <form action="{{ url_for('add_review') }}" method="POST">
+                <input type="hidden" name="book_title" value="{{ book.title }}">
+                <div class="rating-input">
+                    <label>Rating:</label>
+                    <select name="rating" required class="stylish-select">
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <textarea name="review_text" rows="3" placeholder="What did you think of the book?" required class="stylish-textarea"></textarea>
+                <button type="submit" class="btn-primary mt-2">Post Review</button>
+            </form>
+        </div>
+
+        <div class="reviews-list">
+            {% if reviews %}
+                {% for rev in reviews %}
+                <div class="review-item">
+                    <div class="rev-header">
+                        <strong><i class="fa-solid fa-user-circle"></i> {{ rev.username }}</strong>
+                        <span class="rev-stars"><i class="fa-solid fa-star"></i> {{ rev.rating }}/5</span>
+                    </div>
+                    <p class="rev-text">{{ rev.review_text }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-state-text">No reviews yet. Be the first to share your thoughts!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    {% if recommendations %}
+    <div class="detail-recommendations fade-in-up delay-1">
+        <h2>Similar Books</h2>
+        <div class="horizontal-scroll">
+            {% for rec in recommendations %}
+                {% set book = rec %}
+                {% include 'components/book_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

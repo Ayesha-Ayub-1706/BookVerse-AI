@@ -1,65 +1,89 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Navbar Scroll Effect
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.add('scrolled'); // keep blur
-                if(window.scrollY < 10) navbar.classList.remove('scrolled');
-            }
+    // ---- Loader ----
+    const loader = document.getElementById('loader-wrapper');
+    if (loader) {
+        setTimeout(() => {
+            loader.classList.add('hidden');
+        }, 500); // Fades out loader
+    }
+
+    // ---- Mobile Nav Toggle ----
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
         });
     }
 
-    // Smooth Scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const href = this.getAttribute('href');
-            if (href && href !== '#') {
-                const target = document.querySelector(href);
-                if(target) target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    });
-
-    // Horizontal Scrolling
-    const horizontalScrolls = document.querySelectorAll('.horizontal-scroll');
-    horizontalScrolls.forEach(row => {
-        const id = row.getAttribute('id');
-        const prevBtn = document.querySelector(`[data-target="${id}"].prev-btn`);
-        const nextBtn = document.querySelector(`[data-target="${id}"].next-btn`);
-
-        if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', () => {
-                row.scrollBy({ left: -350, behavior: 'smooth' });
-            });
-
-            nextBtn.addEventListener('click', () => {
-                row.scrollBy({ left: 350, behavior: 'smooth' });
-            });
+    // ---- Dark/Light Mode Toggle ----
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    // Check local storage for preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        body.className = savedTheme;
+        updateThemeIcon(savedTheme);
+    } else {
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.className = 'dark-mode';
+            updateThemeIcon('dark-mode');
         }
-    });
+    }
 
-    // Hamburger Menu Toggle
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('nav-links');
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
+    if(themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.className = 'dark-mode';
+                localStorage.setItem('theme', 'dark-mode');
+                updateThemeIcon('dark-mode');
+            } else {
+                body.className = 'light-mode';
+                localStorage.setItem('theme', 'light-mode');
+                updateThemeIcon('light-mode');
+            }
         });
     }
 
-    // Auto-hide flash messages
-    const flashes = document.querySelectorAll('.flash');
+    function updateThemeIcon(theme) {
+        if (!themeToggle) return;
+        if (theme === 'dark-mode') {
+            themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+    }
+
+    // ---- Scroll Animations (Intersection Observer) ----
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); 
+            }
+        });
+    }, observerOptions);
+
+    const fadeSections = document.querySelectorAll('.fade-section');
+    fadeSections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // Auto-hide flash messages after 5 seconds
+    const flashes = document.querySelectorAll('.alert');
     if (flashes.length > 0) {
         setTimeout(() => {
-            flashes.forEach(f => {
-                f.style.opacity = '0';
-                setTimeout(() => f.remove(), 500);
+            flashes.forEach(flash => {
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 500); // wait for fade out
             });
-        }, 3000);
+        }, 5000);
     }
 });

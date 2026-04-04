@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My Reading List - BookVerse AI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+    <h1><i class="fa-solid fa-bookmark" style="color: var(--accent-secondary);"></i> My Reading List</h1>
+    <p>Track your reading journey.</p>
+</div>
+
+{% if books %}
+    {% set statuses = ['Want to Read', 'Reading', 'Completed'] %}
+    {% for status in statuses %}
+        {% set status_books = [] %}
+        {% for b in books %}
+            {% if b['status'] == status %}
+                {% set _ = status_books.append(b) %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if status_books %}
+        <div class="reading-status-section fade-in-up mt-4">
+            <h2 class="status-heading">{{ status }} ({{ status_books|length }})</h2>
+            <div class="horizontal-scroll">
+                {% for book in status_books %}
+                    {% include 'components/book_card.html' %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+<div class="empty-state fade-in-up">
+    <h2>Your reading list is empty</h2>
+    <p>Keep track of books you want to read, are currently reading, or have finished.</p>
+    <a href="{{ url_for('home') }}" class="btn-primary mt-2">Explore Books</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}BookVerse AI - Find Your Next Favorite Book{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="bounce-in">Find Your Next <span class="accent gradient-text">Favorite Book</span></h1>
+        <p class="fade-in">Experience a personalized reading journey driven by Machine Learning. Dive into worlds you'll love based on what you've enjoyed before.</p>
+        <div class="hero-buttons fade-in-up">
+            <a href="{{ url_for('signup') }}" class="btn-primary btn-large">Get Started Now</a>
+            <a href="{{ url_for('login') }}" class="btn-secondary btn-large">Login to Account</a>
+        </div>
+    </div>
+    
+    <!-- Animated background or floating elements -->
+    <div class="floating-elements">
+        <i class="fa-solid fa-book float-1"></i>
+        <i class="fa-solid fa-star float-2"></i>
+        <i class="fa-solid fa-bookmark float-3"></i>
+    </div>
+</section>
+
+<section class="how-it-works fade-section">
+    <h2 class="section-title">How BookVerse AI Works</h2>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3>1. Search Your Favorite</h3>
+            <p>Tell us a book you deeply loved, and our AI model will map its genre and style.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-icon"><i class="fa-solid fa-robot"></i></div>
+            <h3>2. Get AI Recommendations</h3>
+            <p>Our collaborative filtering algorithm finds the perfect matches just for you.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-icon"><i class="fa-solid fa-bookmark"></i></div>
+            <h3>3. Save & Explore</h3>
+            <p>Store books in your reading list, add favorites, and rate your read books.</p>
+        </div>
+    </div>
+</section>
+
+<section class="demo-recommendations fade-section">
+    <h2 class="section-title">Sneak Peek: Recommendations</h2>
+    <div class="demo-wrapper">
+        <p class="demo-helpertext">Try discovering matches (Sign in for full access)</p>
+        <div class="demo-books-grid">
+            {% for book in demo_recs %}
+            <div class="book-card preview-card">
+                <img src="{{ book.image }}" alt="{{ book.title }}">
+                <div class="book-card-info">
+                    <h4>{{ book.title }}</h4>
+                    <p>{{ book.author }}</p>
+                    <div class="lock-overlay">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Sign in to unlock matches</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="testimonials fade-section">
+    <h2 class="section-title">Recently Loved by Readers</h2>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <p>"BookVerse found me the exact sci-fi thriller I was craving after reading The Martian. Incredible recommendations!"</p>
+            <div class="t-author">- Sarah Jenks</div>
+        </div>
+        <div class="testimonial-card">
+            <p>"The reading list feature and UI are gorgeous. It feels like my personal premium library."</p>
+            <div class="t-author">- Mark T.</div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-bottom">
+    <h2>Ready to discover your next adventure?</h2>
+    <a href="{{ url_for('signup') }}" class="btn-primary btn-xl">Create Your Free Account</a>
+</section>
+
+{% endblock %}

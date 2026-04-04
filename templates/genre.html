@@ -1,44 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ genre }} Books - BookVerse AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body style="animation: fadeInRight 0.8s ease-out;">
-    <nav class="navbar">
-        <div class="nav-brand"><a href="{{ url_for('home') }}">BookVerse AI</a></div>
-        <div class="hamburger" id="hamburger">
-            <span></span><span></span><span></span>
-        </div>
-        <div class="nav-links" id="nav-links">
-            <a href="{{ url_for('home') }}" class="btn-primary" style="padding: 0.5rem 1.5rem;">Back to Home</a>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}{{ genre }} Books - BookVerse AI{% endblock %}
 
-    <div class="section-header" style="margin-top: 8rem; justify-content: center;">
-        <h2>Top {{ genre }} Books</h2>
-    </div>
+{% block content %}
+<div class="page-header fade-in">
+    <h1>Explore <span class="accent">{{ genre }}</span></h1>
+    <p>Top rated books in this genre.</p>
+</div>
 
-    <div class="premium-grid">
-        {% for book in books %}
-        <a href="{{ url_for('book_detail', book_title=book.title) }}" style="text-decoration: none; color: inherit;">
-        <div class="book-card-premium">
-            <img src="{{ book.image }}" alt="{{ book.title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover';">
-            <div class="bc-overlay">
-                <div class="bc-title" title="{{ book.title }}">{{ book.title }}</div>
-                <div class="bc-author">{{ book.author }}</div>
-                <div class="bc-meta">
-                    <span class="bc-genre">{{ book.genre }}</span>
-                    <span class="bc-rating">⭐ {{ book.rating }}</span>
-                </div>
-            </div>
-        </div>
-        </a>
-        {% endfor %}
-    </div>
-    
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+{% if books %}
+<div class="books-grid fade-in-up mt-4">
+    {% for book in books %}
+        {% include 'components/book_card.html' %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state fade-in-up mt-4">
+    <p>No books found for this genre. Check back later!</p>
+</div>
+{% endif %}
+{% endblock %}

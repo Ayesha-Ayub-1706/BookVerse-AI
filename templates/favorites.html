@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}My Favorites - BookVerse AI{% endblock %}
+
+{% block content %}
+<div class="page-header fade-in">
+    <h1><i class="fa-solid fa-heart" style="color: var(--accent-primary);"></i> My Favorites</h1>
+    <p>Books you loved the most.</p>
+</div>
+
+{% if books %}
+<div class="books-grid fade-in-up">
+    {% for book in books %}
+        {% include 'components/book_card.html' %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state fade-in-up">
+    <img src="https://via.placeholder.com/400x300?text=No+Favorites+Yet" alt="Empty" style="border-radius:12px; margin-bottom: 1rem; max-width:100%; height:auto;">
+    <h2>Your favorites list is empty</h2>
+    <p>Start exploring books and click the heart icon to save them here.</p>
+    <a href="{{ url_for('home') }}" class="btn-primary mt-2">Explore Books</a>
+</div>
+{% endif %}
+{% endblock %}

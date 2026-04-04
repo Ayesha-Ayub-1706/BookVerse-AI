@@ -1,0 +1,18 @@
+<a href="{{ url_for('book_detail', book_title=book.title) }}" class="book-card-link">
+    <div class="book-card">
+        <div class="img-container">
+            <img src="{{ book.image }}" alt="{{ book.title }}" loading="lazy">
+            <div class="hover-overlay">
+                <span class="btn-view">View Details</span>
+            </div>
+        </div>
+        <div class="book-card-info">
+            <h4 title="{{ book.title }}">{{ book.title }}</h4>
+            <p class="author">{{ book.author }}</p>
+            <div class="card-meta">
+                <span class="genre">{{ book.genre }}</span>
+                <span class="rating"><i class="fa-solid fa-star"></i> {{ book.rating }}</span>
+            </div>
+        </div>
+    </div>
+</a>

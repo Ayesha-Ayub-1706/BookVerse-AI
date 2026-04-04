@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BookVerse AI{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body class="light-mode">
+    <div id="loader-wrapper" class="loader-wrapper hidden">
+        <div class="loader"></div>
+    </div>
+
+    {% block navbar %}
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="logo">
+                <i class="fa-solid fa-book-open-reader"></i> BookVerse <span class="accent">AI</span>
+            </a>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="nav-toggle" id="navToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+
+                {% if 'user_id' in session %}
+                <form action="{{ url_for('search_post') }}" method="POST" class="nav-search" id="navSearchForm">
+                    <input type="text" name="book_name" placeholder="Search for a book..." required>
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+                <a href="{{ url_for('favorites_page') }}" class="nav-link"><i class="fa-solid fa-heart"></i>
+                    Favorites</a>
+                <a href="{{ url_for('reading_list_page') }}" class="nav-link"><i class="fa-solid fa-bookmark"></i>
+                    Reading List</a>
+
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <i class="fa-solid fa-user-circle"></i> {{ session.get('username') }}
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('profile') }}">Profile</a>
+                        {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+                <a href="{{ url_for('signup') }}" class="btn-signup">Sign Up</a>
+                {% endif %}
+
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 BookVerse AI. Built for book lovers.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
