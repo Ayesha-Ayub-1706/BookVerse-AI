@@ -14,6 +14,13 @@ The project uses Machine Learning with TF-IDF vectorization and cosine similarit
 - Book Detail Page
 - Responsive Frontend
 - Machine Learning Based Recommendations
+- - Dynamic personalized dashboard
+- Favorites and Reading List
+- Recently viewed and search history
+- Top genre and saved books tracking
+- Admin panel for adding/editing books
+- Retrain recommendation model button
+- Animated premium UI with glassmorphism and 3D effects
 
 ---
 
